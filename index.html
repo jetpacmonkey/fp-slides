@@ -3,11 +3,11 @@
 <head>
   <title>Functional Programming</title>
 
-  <link rel="stylesheet" href="node_modules/reveal.js/css/reveal.css">
-  <link rel="stylesheet" href="node_modules/reveal.js/css/theme/black.css">
+  <link rel="stylesheet" href="lib/reveal.js/css/reveal.css">
+  <link rel="stylesheet" href="lib/reveal.js/css/theme/black.css">
 
   <!-- Theme used for syntax highlighting of code -->
-  <link rel="stylesheet" href="node_modules/reveal.js/lib/css/zenburn.css">
+  <link rel="stylesheet" href="lib/reveal.js/lib/css/zenburn.css">
 </head>
 <body>
   <div class="reveal">
@@ -350,17 +350,17 @@
     </div>
   </div>
 
-  <script src="node_modules/reveal.js/lib/js/head.min.js"></script>
-  <script src="node_modules/reveal.js/js/reveal.js"></script>
+  <script src="lib/reveal.js/lib/js/head.min.js"></script>
+  <script src="lib/reveal.js/js/reveal.js"></script>
   <script>
     Reveal.initialize({
       dependencies: [
         // Interpret Markdown in <section> elements
-        { src: 'node_modules/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-        { src: 'node_modules/reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+        { src: 'lib/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+        { src: 'lib/reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
 
         // Syntax highlight for <code> elements
-        { src: 'node_modules/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+        { src: 'lib/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
       ]
     });
   </script>
