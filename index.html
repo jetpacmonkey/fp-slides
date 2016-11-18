@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Functional Programming</title>
+
+  <link rel="stylesheet" href="node_modules/reveal.js/css/reveal.css">
+  <link rel="stylesheet" href="node_modules/reveal.js/css/theme/black.css">
+
+  <!-- Theme used for syntax highlighting of code -->
+  <link rel="stylesheet" href="node_modules/reveal.js/lib/css/zenburn.css">
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section data-markdown>
+        <script type="text/template">
+          ## Functional programming, UI, and state
+
+          <p class="fragment">_\~ or \~_</p>
+
+          <h2 class="fragment">Mutation makes children cry</h2>
+        </script>
+      </section>
+      <section>
+        <section>Imperative vs Declarative</section>
+        <section data-markdown>
+          ## To begin...
+
+          Imagine a simple todo list spec...
+
+          * List of items
+          * Cross off item when clicked
+          * Count of done/total at bottom
+        </section>
+        <section data-markdown>
+          ## Imperative UI with jQuery
+
+          * HTML containers
+          * Add line items
+          * Update as needed
+            * Counts
+            * "Completed" state
+
+          [Example](http://codepen.io/jetpacmonkey/pen/JbbaEE)
+        </section>
+        <section data-markdown>
+          ## New specs!
+
+          ![alert](https://media.giphy.com/media/wuOtkQMVrqdRS/giphy.gif)
+
+          * Progress bar
+          * Say "done" when all are checked off
+          * Filter by done/todo/all
+          * Filter by search text
+        </section>
+        <section data-markdown>
+          ![facepalm](http://gif-finder.com/wp-content/uploads/2015/02/Steve-Carell-Facepalm.gif)
+        </section>
+        <section data-markdown>
+          ## Changes
+
+          * Every time a todo is added/changed
+            * Update progress bar
+            * Update "done" state
+          * When filter link is clicked, or search text is entered
+            * Hide/show items
+            * Update counts
+            * Update progress bar
+            * Update "done" state
+        </section>
+        <section>
+          <p>Everything has to be kept in sync</p>
+          <p class="fragment">Every possible permutation has to be coded for</p>
+          <p class="fragment">What about searching within a filtered list?</p>
+          <p class="fragment">What about the next feature request?</p>
+          <img src="http://reactiongifs.me/wp-content/uploads/2014/06/it-crowd-maurice-moss-frustration-fuck-this.gif" class="fragment" />
+        </section>
+        <section data-markdown>
+          ## Issues with directly mutating UI
+
+          * Related data needs to manually be synchronized
+          * Difficult to be modular
+          * Subsequent changes grow complexity exponentially
+        </section>
+      </section>
+      <section>
+        <section>There's a better way...</section>
+        <section data-markdown>
+          ## Declarative UI with React
+
+          * Store todos as data
+          * Direct mapping of data to elements
+          * Update stored state, not the elements themselves
+
+          [Example](http://codepen.io/jetpacmonkey/pen/gLLdeB?editors=0110)
+        </section>
+        <section data-markdown>
+          ## Tradeoffs?
+
+          * ~100 lines vs ~50
+          * More library overhead
+          * Questionable for such a simple app
+        </section>
+        <section>Let's see how well it handles that spec change...</section>
+        <section data-markdown>
+          <script type="text/markdown">
+            ## Progress Bar/"Done"
+
+            ```javascript
+            function ProgressBar({ done, total }) {
+              let innerClassName = 'progress-inner';
+
+              // Don't divide by zero
+              const width = (total === 0 ?
+                '0' :
+                (100 * done / total) + '%'
+              );
+
+              if (total !== 0 && done === total) {
+                innerClassName += ' all-done';
+              }
+
+              return (
+                <div className="progress-outer">
+                  <div
+                    className={innerClassName}
+                    style={{ width: width }}
+                  />
+                </div>
+              );
+            }
+            ```
+
+            ```javascript
+            <ProgressBar done={done} total={total} />
+            ```
+          </script>
+        </section>
+        <section data-markdown>
+          <script type="text/markdown">
+            ## Filter/Search
+
+            ```javascript
+            filterTodos(todos = this.state.todos, filter = this.state.filter) {
+              if (filter === 'complete') {
+                return todos.filter(t => t.complete);
+              }
+              if (filter === 'incomplete') {
+                return todos.filter(t => !t.complete);
+              }
+              return todos;
+            }
+
+            searchTodos(todos = this.state.todos, search = this.state.search) {
+              return todos.filter(t => (t.name.indexOf(search) !== -1));
+            }
+            ```
+
+            ```javascript
+              const allTodos = this.state.todos;
+              const todos = this.filterTodos(this.searchTodos(allTodos));
+            ```
+          </script>
+        </section>
+        <section data-markdown>
+          [Example](http://codepen.io/jetpacmonkey/pen/QGGVXw?editors=0110)
+        </section>
+        <section data-markdown>
+          ## Key Benefits
+
+          * Child components don't know about each other (loose coupling)
+          * Separation of data from presentation
+          * New features don't have to change old ones
+          * Dev doesn't have to keep track of every possible code path
+
+          ![thumbs up](http://www.reactiongifs.com/wp-content/uploads/2013/04/thumb-is-up.gif)
+        </section>
+        <section>
+          With a declarative style, we tell the machine what result we want,
+          not how to get there.
+        </section>
+      </section>
+      <section>
+        <section>So how else can we be more declarative?</section>
+        <section data-markdown>
+          ## Functional programming
+
+          We saw declarative UI, now let's look at a more declarative style for
+          functions themselves.
+        </section>
+        <section data-markdown>
+          <script type="text/markdown">
+            ## Have you ever been here?
+
+            ```javascript
+              function getLowestRegularShowtimePrice(showtimes) {
+                var lowest = Math.Infinity;
+                for (var i=0; i < showtimes.length; ++i) {
+                  var showtime = showtimes[i];
+                  if (hasRegularTickets(showtime)) {
+                    for (var j=0; j < showtime.regularTicketSections; ++j) {
+                      var section = showtime.regularTicketSections[j];
+                      if (section.price < lowest) {
+                        lowest = section.price;
+                      }
+                    }
+                  }
+                }
+
+                return lowest;
+              }
+            ```
+          </script>
+        </section>
+        <section data-markdown>
+          <script type="text/markdown">
+            ## Wouldn't you rather be here?
+
+            ```javascript
+              const getLowestRegularShowtimePrice = _.flow(
+                fp.filter(hasRegularTickets),
+                fp.map(_.flow(
+                  fp.get('regularTicketSections'),
+                  fp.map('price'),
+                  fp.min
+                )),
+                fp.min
+              );
+            ```
+
+            Maybe not at first glance. Let's back up...
+          </script>
+        </section>
+      </section>
+      <section>
+        Functional programming, at its most basic, is defining everything in
+        terms of simple 1-to-1 transformations, with consistent outputs for
+        consistent inputs.
+      </section>
+      <section>Some tools to help us define relationships more easily...</section>
+      <section>
+        <section data-markdown>
+          ## Currying
+
+          Allows the programmer to only partially fill in the arguments of a
+          function, defining another function that takes the rest.
+
+          ```
+            threeWords(a, b, c) {
+              return a + ' ' + b + ' ' + c;
+            }
+
+            twoWords = threeWords('hey'); // function that takes b and c
+            oneWord = twoWords('there'); // function that takes c
+
+            oneWord('world'); // 'hey there world'
+          ```
+        </section>
+        <section data-markdown>
+          ## A more practical currying example
+
+          ```
+            map(fn, arr) {
+              acc = [];
+              for (var i=0; i < arr.length; ++i) {
+                acc.push(fn(acc[i]));
+              }
+              return acc;
+            }
+
+            allPrices = map(item => item.price);
+
+            allPrices([{ price: 3 }, { price: 3.5 }]) // => [3, 3.5]
+          ```
+        </section>
+      </section>
+      <section>
+        <section data-markdown>
+          ## Functional Composition
+
+          Combines functions together, so the result of one becomes the input
+          of the other.
+
+          `compose(f, g)(x) === f(g(x))`
+
+          Front-end team usually uses `_.flow`, which is the same thing
+          reversed.
+
+          `_.flow(f, g)(x) === g(f(x))`
+
+          Or, the way my mind tends to parse it...
+
+          ```
+          tmp = f(x)
+          return g(tmp)
+          ```
+        </section>
+        <section data-markdown>
+          ## Composition Example
+
+          ```
+            min(arr) {
+              lowest = arr[0];
+              for (var i=1; i < arr.length; ++i) {
+                if (arr[i] < lowest) {
+                  lowest = arr[i];
+                }
+              }
+              return lowest;
+            }
+
+            lowestPrice = _.flow(allPrices, min);
+
+            lowestPrice([{ price: 3 }, { price: 3.5 }]) // => 3
+          ```
+        </section>
+      </section>
+      <section data-markdown>
+        ## Now let's look at that example again...
+
+        ```javascript
+          const getLowestRegularShowtimePrice = _.flow(
+            fp.filter(hasRegularTickets),
+            fp.map(_.flow(
+              fp.get('regularTicketSections'),
+              fp.map('price'),
+              fp.min
+            )),
+            fp.min
+          );
+        ```
+      </section>
+      <section data-markdown>
+        ## Some benefits of a functional, declarative style
+
+        * Modular
+        * Reusable
+        * Easily testable
+        * Easy memoization
+      </section>
+      <section data-markdown>
+        ## Summary
+
+        * Declarative style gives consistent, extensible code
+        * Currying gives convenient function factories
+        * Composition turns functions into building blocks
+        * FP is basically unicorn farts
+      </section>
+      <section>Discussion!</section>
+    </div>
+  </div>
+
+  <script src="node_modules/reveal.js/lib/js/head.min.js"></script>
+  <script src="node_modules/reveal.js/js/reveal.js"></script>
+  <script>
+    Reveal.initialize({
+      dependencies: [
+        // Interpret Markdown in <section> elements
+        { src: 'node_modules/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+        { src: 'node_modules/reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+
+        // Syntax highlight for <code> elements
+        { src: 'node_modules/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      ]
+    });
+  </script>
+</body>
+</html>

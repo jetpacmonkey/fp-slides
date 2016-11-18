@@ -1,0 +1,8 @@
+Functional programming, UI, and state
+Why mutation makes children cry and declarative programming is the bee's knees
+
+jQuery todo example
+List of todos, summary of how many visible/complete at the bottom
+Add a todo - make sure to update totals!
+Finish a todo - make sure to update complete count!
+Filter? Show percentage completed? Progress bar? Say "Done!"?
